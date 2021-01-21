@@ -4,6 +4,9 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const auth = require("../middleware/auth");
+var nodemailer = require('nodemailer');
+var async = require('async');
+var crypto = require('crypto');
 
 const User = require("../model/User");
 
@@ -31,7 +34,7 @@ router.post("/signup", [
         const { username, password, email, phonenumber } = req.body;
         try {
             let user = await User.findOne({
-                username
+                email
             });
             if (user) {
                 return res.status(400).json({
@@ -137,4 +140,108 @@ router.get("/loggedin", auth, async(req, res) => {
     }
 });
 // INFO  @Akash and @Bhujith... To test this loggedin api... Kindly first test login/signup api in postman and a token will be generated...Now test this /api/loggedin by adding the token in the headers section( no body request needed)
+
+router.post('/forgotpassword',function(req,res,next){
+    async.waterfall([
+        function(done){
+            crypto.randomBytes(30,function(error,buffer){
+                var token = buffer.toString('hex');
+                done(error,token);
+            });
+        },
+        function(token,done) {
+            User.findOne({email: req.body.email},function(err,user){
+                if(!user){
+                    return res.status(400).json({
+                        message: "No User of this email exists."
+                    });
+                }
+                user.resetPasswordToken = token;
+                user.resetPasswordExpires = Date.now() +3600000;
+                user.save(function(err){
+                    done(err,token,user);
+                });
+            });
+        },
+        function(token,user,done){
+            var smtptrans = nodemailer.createTransport({
+                service: 'Gmail',
+                auth: {
+                    user: 'homeschooling260119@gmail.com',
+                    pass: 'tn58ac8308'
+                }
+            });
+            var mailOptions = {
+                to: user.email,
+                from: 'homeschooling260119@gmail.com',
+                subject: 'Password Reset for HomeSchooling',
+                text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+                  'Please click on the following link, or paste this into your browser\n\n' +
+                  'http://' + req.headers.host + '/resetpassword/' + token + '\n\n' +
+                  'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+              };
+              smtptrans.sendMail(mailOptions, function(err) {
+                done(err, 'done');
+              });
+        }
+
+    ],
+    function(err){
+        if (err) 
+        return next(err);
+    }
+)
+});
+router.post("/resetpassword/:token",  function(req,res){
+    async.waterfall([
+         function(done) {
+          User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+            if (!user) {
+                return res.status(400).json({
+                    message: "No User of this email exists."
+                });
+            }
+            // const salt =  bcrypt.genSalt(15);
+            // user.password =  bcrypt.hash(req.body.password, salt);
+            // user.password = req.body.password;
+            // bcrypt.genSalt(12, (err, salt) => {
+            //     bcrypt.hash(req.body.password, salt, (err, hash) => {
+            //         user.password = req.body.password;
+            //     });
+            // });
+            user.password = req.body.password;
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpires = undefined;
+    
+            user.save(function(err) {
+              req.logIn(user, function(err) {
+                return next(err);
+                done(err, user);
+              });
+            });
+          });
+        },
+        function(user, done) {
+          var smtpTrans = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+              user: 'homeschooling260119@gmail.com',
+              pass: 'tn58ac8308'
+            }
+          });
+          var mailOptions = {
+            to: user.email,
+            from: 'homeschooling260119@gmail.com',
+            subject: 'Your password has been changed',
+            text: 'Hello,\n\n' +
+              'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+          };
+          smtpTrans.sendMail(mailOptions, function(err) {
+            done(err);
+          });
+        }
+      ], function(err) {
+        console.log('Error',err);
+      });
+});
 module.exports = router;
