@@ -168,7 +168,7 @@ router.post('/forgotpassword', function(req, res, next) {
                         done(err, token, user)
                         return res.status(200).json({
                             resetPasswordToken: user.resetPasswordToken,
-                            message: "reset password fuccessfully"
+                            message: "An email with the reset password link will be sent.Please check your email-id"
                         })
 
                     });
@@ -188,7 +188,7 @@ router.post('/forgotpassword', function(req, res, next) {
                     subject: 'Password Reset for HomeSchooling',
                     text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
                         'Please click on the following link, or paste this into your browser\n\n' +
-                        'http://' + req.headers.host + '/api/resetpassword/' + token + '\n\n' +
+                        'http://localhost:4200/api/resetpassword/' + token + '\n\n' +
                         'If you did not request this, please ignore this email and your password will remain unchanged.\n'
                 };
                 smtptrans.sendMail(mailOptions, function(err) {
@@ -203,6 +203,8 @@ router.post('/forgotpassword', function(req, res, next) {
         }
     )
 });
+
+
 router.post("/resetpassword/:token", function(req, res) {
     async.waterfall([
         function(done) {
@@ -230,7 +232,15 @@ router.post("/resetpassword/:token", function(req, res) {
                         user.resetPasswordExpires = undefined;
 
                         user.save(function(err) {
+                            if (err) {
+                                return res.status(500).send({
+                                    msg: err.message
+                                })
+                            }
                             done(err, user);
+                            return res.status(200).json({
+                                message: "Your password is successfully changed"
+                            })
                         });
                     }
                 })
