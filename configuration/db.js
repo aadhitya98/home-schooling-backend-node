@@ -5,7 +5,8 @@ const MONGOURL = "mongodb+srv://home-schooling:godislove158@cluster0.ncicr.mongo
 const MongoServer = async() => {
     try {
         await mongoose.connect(MONGOURL, {
-            useNewUrlParser: true
+            useNewUrlParser: true,
+            useUnifiedTopology: true
         });
         console.log("Connected to DB !!");
     } catch (e) {
