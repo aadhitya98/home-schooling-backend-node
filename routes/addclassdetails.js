@@ -5,7 +5,6 @@ const User = require("../model/User");
 const Student = require("../model/Students");
 const multer = require('multer');
 const readXlsxFile = require("read-excel-file/node");
-const AddStudentXL = require("../model/StudentsXL")
 global.__basedir = __dirname;
 
 router.post('/addclassdetails', async function(req, res) {
@@ -138,15 +137,16 @@ const excelFilter = (req, file, cb) => {
             studentName: row[1],
             class: row[2],
             section: row[3],
-            email: row[4],
-
           };
-  
+          // studentdata.push(email);
           studentdata.push(student);
         });
         //db = client.db('HomeSchooling');
         //addstudents = db.collection('addstudents')
-        AddStudentXL.insertMany(studentdata)
+        console.log("EMAIL",req.body.email);
+        Student.updateMany({
+            email: req.body.email
+        }, { $addToSet: { addstudent: studentdata } }, { upsert: true })
           .then(() => {
             res.status(200).send({
               message: "Uploaded the file successfully: " + req.file.originalname,
