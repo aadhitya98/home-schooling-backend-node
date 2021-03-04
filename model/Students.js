@@ -5,17 +5,18 @@ const StudentSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    addstudent: [
-        {
-            class: {type: String},
-            section: {type: String},
-            studentName: {type: String},
-            rollNumber: {type: String},
-            _id : false
+    addstudent: [{
+            class: { type: String },
+            section: { type: String },
+            studentName: { type: String },
+            rollNumber: { type: String },
+            teacherName: { type: String },
+            phoneNumber: { type: String },
+            _id: false
         },
-       
+
     ]
 
 });
 
-module.exports = mongoose.model("AddStudent",StudentSchema);
+module.exports = mongoose.model("AddStudent", StudentSchema);

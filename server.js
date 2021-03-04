@@ -7,6 +7,7 @@ const userDetails = require("./routes/userdetails");
 const addclassDetails = require("./routes/addclassdetails");
 MongoServer();
 const PORT = process.env.PORT || 4000;
+
 app.use(bodyParser.json());
 app.use(cors())
 app.get("/", (req, res) => {
@@ -14,7 +15,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api", userDetails);
-app.use("/addclass",addclassDetails);
+app.use("/addclass", addclassDetails);
 //userDetails.initialize(app)
 app.listen(PORT, (req, res) => {
     console.log(`Server Started at PORT ${PORT}`);
