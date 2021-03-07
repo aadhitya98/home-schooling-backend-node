@@ -9,7 +9,7 @@ const StudentSchema = mongoose.Schema({
             class: { type: String },
             section: { type: String },
             studentName: { type: String },
-            rollNumber: { type: String },
+            rollNumber: { type: String, unique:true }, 
             teacherName: { type: String },
             phoneNumber: { type: String },
             _id: false

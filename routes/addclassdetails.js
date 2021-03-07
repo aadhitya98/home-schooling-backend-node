@@ -171,5 +171,67 @@ const uploaded = async(req, res) => {
     }
 };
 router.post("/uploadstudentxl", uploadFile.single("file"), uploaded);
+router.post("/getallstudents/:class/:section",function(req,res){
+   // const classs = req.params.class;
+   // const section = req.params.section;
+    //console.log('PARAM',req.params.email)
+//     Student.addstudent.forEach(function(element) 
+// { 
+//     console.log(Student.length) 
+// });
+const { email } = req.body;
+// addstudentuser = new Student({
+//     email,
+//     addstudent
+// });
+       const elementsArray = [];
+        Student.find({"email":email},function(err,student){
+            //Student.find({"addstudent.class":req.params.class},function(err,student){
+               //console.log("AAA",student[student.length-1].addstudent) 
+                student[student.length-1].addstudent.forEach(element => {
+                    if(element!=null){
+                        if(element.class == req.params.class && element.section == req.params.section )
+                        elementsArray.push(element);
+                    }
 
+                })
+                if(err) throw err;
+                var response = {
+                    statusCode: 200,
+                    headers:  { 'Content-Type': 'application/json' },
+                    students:    elementsArray
+                  }
+                res.send(response);
+
+       
+            //})
+       // }
+    // }))
+
+})
+})
+
+router.get("/countallstudents/:class/:section",function(req,res){
+         var count = 0;
+         const { email } = req.body;
+
+         Student.find({"email":email},function(err,student){
+                 student[student.length-1].addstudent.forEach(element => {
+                     if(element!=null){
+                         if(element.class == req.params.class && element.section == req.params.section )
+                         count++;
+                     }
+ 
+                 })
+                 var response = {
+                    statusCode: 200,
+                    headers:  { 'Content-Type': 'application/json' },
+                    count:    count
+                  }
+                 console.log('count',count);
+                  if(err) throw err;
+                  res.send(response);
+ 
+ })
+ })
 module.exports = router;
