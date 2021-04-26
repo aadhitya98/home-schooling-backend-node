@@ -211,10 +211,10 @@ const { email } = req.body;
 })
 })
 
+
 router.get("/countallstudents/:class/:section",function(req,res){
          var count = 0;
          const { email } = req.body;
-
          Student.find({"email":email},function(err,student){
                  student[student.length-1].addstudent.forEach(element => {
                      if(element!=null){
@@ -234,4 +234,29 @@ router.get("/countallstudents/:class/:section",function(req,res){
  
  })
  })
+
+ router.get("/getstudents/:class/:section",function(req,res){
+
+    const { email } = req.body;
+    let getstudents = [];
+ 
+
+    Student.find({"email":email},function(err,student){
+            student[student.length-1].addstudent.forEach(element => {
+                if(element!=null){
+                    if(element.class == req.params.class && element.section == req.params.section )
+                    getstudents.push(element);
+                }
+             })
+            var response = {
+               statusCode: 200,
+               headers:  { 'Content-Type': 'application/json' },
+               getstudents:   getstudents
+             }
+             if(err) throw err;
+             res.send(response);
+
+})
+})
+
 module.exports = router;
