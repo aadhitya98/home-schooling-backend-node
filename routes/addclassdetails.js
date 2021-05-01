@@ -6,6 +6,7 @@ const Student = require("../model/Students");
 const multer = require('multer');
 const readXlsxFile = require("read-excel-file/node");
 global.__basedir = __dirname;
+var _ = require('lodash');
 
 router.post('/addclassdetails', async function(req, res) {
     const { email, addclass } = req.body;
@@ -252,6 +253,40 @@ router.get("/countallstudents/:class/:section",function(req,res){
                statusCode: 200,
                headers:  { 'Content-Type': 'application/json' },
                getstudents:   getstudents
+             }
+             if(err) throw err;
+             res.send(response);
+
+})
+})
+router.post("/getclasses",function(req,res){
+
+    const { email } = req.body;
+    let getstudents = [];
+ 
+
+    Student.find({"email":email},function(err,student){
+        console.log('Email',email);
+            classMap = new Map;
+            student[student.length-1].addstudent.forEach(element => {
+                if(element!=null){
+                    var classandsection = element.class + " "+ element.section;
+                    classMap.set(classandsection,element.teacherName);
+                    classandsection ="";
+                //     getstudents.push(element);
+                // if(element.class not in getstudents) {
+
+                // }
+                // console.log("ELE1",element.section);
+                 }
+
+             })
+             console.log('classMap',classMap);
+
+            var response = {
+               statusCode: 200,
+               headers:  { 'Content-Type': 'application/json' },
+               classes:   [...classMap]
              }
              if(err) throw err;
              res.send(response);
