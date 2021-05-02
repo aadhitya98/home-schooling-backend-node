@@ -7,7 +7,7 @@ const auth = require("../middleware/auth");
 var nodemailer = require('nodemailer');
 var async = require('async');
 var crypto = require('crypto');
-
+// var logger = require('logger').createLogger();
 const User = require("../model/User");
 const { writer } = require("repl");
 
@@ -70,6 +70,8 @@ router.post("/signup", [
             console.log("Error", err.message);
             res.status(500).send("Error in Storing the details to the DB");
         }
+        console.info('Sign up api called');
+
     }
 );
 
@@ -129,7 +131,10 @@ router.post(
                 message: "Something went wrong!"
             });
         }
+        console.info('login Api called');
+
     }
+    
 );
 
 router.get("/loggedin", auth, async(req, res) => {
@@ -139,6 +144,8 @@ router.get("/loggedin", auth, async(req, res) => {
     } catch (e) {
         res.send({ message: "Error in getting user details" });
     }
+    console.info('User Logged In');
+
 });
 // INFO  @Akash and @Bhujith... To test this loggedin api... Kindly first test login/signup api in postman and a token will be generated...Now test this /api/loggedin by adding the token in the headers section( no body request needed)
 
@@ -201,7 +208,10 @@ router.post('/forgotpassword', function(req, res, next) {
             if (err)
                 return next(err);
         }
+        
     )
+    console.info('Forgot Password api called');
+
 });
 
 
@@ -269,5 +279,7 @@ router.post("/resetpassword/:token", function(req, res) {
     ], function(err) {
         console.log('Error', err);
     });
+    console.info('Reset password done');
+
 });
 module.exports = router;

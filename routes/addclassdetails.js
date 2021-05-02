@@ -7,6 +7,8 @@ const multer = require('multer');
 const readXlsxFile = require("read-excel-file/node");
 global.__basedir = __dirname;
 var _ = require('lodash');
+// var logger = require('logger').createLogger();
+
 
 router.post('/addclassdetails', async function(req, res) {
     const { email, addclass } = req.body;
@@ -43,6 +45,8 @@ router.post('/addclassdetails', async function(req, res) {
     // console.log('REQ',req.body);
     // console.log('EMAIL',email);
     console.log('Req', addclass);
+    console.info('Add class details api called');
+
 
 })
 
@@ -93,6 +97,7 @@ router.post('/addstudentdetails', async function(req, res) {
         console.log("Error", err.message);
         res.status(500).send("Error in Storing the details to the DB");
     }
+    console.info('Add student details api called');
 })
 const excelFilter = (req, file, cb) => {
     if (
@@ -203,7 +208,7 @@ const { email } = req.body;
                     students:    elementsArray
                   }
                 res.send(response);
-
+                console.info('get all students api called');
        
             //})
        // }
@@ -232,6 +237,7 @@ router.get("/countallstudents/:class/:section",function(req,res){
                  console.log('count',count);
                   if(err) throw err;
                   res.send(response);
+                  console.info('count all students api called');
  
  })
  })
@@ -256,6 +262,7 @@ router.get("/countallstudents/:class/:section",function(req,res){
              }
              if(err) throw err;
              res.send(response);
+             console.info('get students based on class api called');
 
 })
 })
@@ -290,6 +297,7 @@ router.post("/getclasses",function(req,res){
              }
              if(err) throw err;
              res.send(response);
+             console.info('get classes api called');
 
 })
 })
