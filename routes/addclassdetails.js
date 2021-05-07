@@ -177,129 +177,131 @@ const uploaded = async(req, res) => {
     }
 };
 router.post("/uploadstudentxl", uploadFile.single("file"), uploaded);
-router.post("/getallstudents/:class/:section",function(req,res){
-   // const classs = req.params.class;
-   // const section = req.params.section;
+router.post("/getallstudents/:class/:section", function(req, res) {
+    // const classs = req.params.class;
+    // const section = req.params.section;
     //console.log('PARAM',req.params.email)
-//     Student.addstudent.forEach(function(element) 
-// { 
-//     console.log(Student.length) 
-// });
-const { email } = req.body;
-// addstudentuser = new Student({
-//     email,
-//     addstudent
-// });
-       const elementsArray = [];
-        Student.find({"email":email},function(err,student){
-            //Student.find({"addstudent.class":req.params.class},function(err,student){
-               //console.log("AAA",student[student.length-1].addstudent) 
-                student[student.length-1].addstudent.forEach(element => {
-                    if(element!=null){
-                        if(element.class == req.params.class && element.section == req.params.section )
-                        elementsArray.push(element);
-                    }
+    //     Student.addstudent.forEach(function(element) 
+    // { 
+    //     console.log(Student.length) 
+    // });
+    const { email } = req.body;
+    // addstudentuser = new Student({
+    //     email,
+    //     addstudent
+    // });
+    const elementsArray = [];
+    Student.find({ "email": email }, function(err, student) {
+        //Student.find({"addstudent.class":req.params.class},function(err,student){
+        //console.log("AAA",student[student.length-1].addstudent) 
+        student[student.length - 1].addstudent.forEach(element => {
+            if (element != null) {
+                if (element.class == req.params.class && element.section == req.params.section)
+                    elementsArray.push(element);
+            }
 
-                })
-                if(err) throw err;
-                var response = {
-                    statusCode: 200,
-                    headers:  { 'Content-Type': 'application/json' },
-                    students:    elementsArray
-                  }
-                res.send(response);
-                console.info('get all students api called');
-       
-            //})
-       // }
-    // }))
+        })
+        if (err) throw err;
+        var response = {
+            statusCode: 200,
+            headers: { 'Content-Type': 'application/json' },
+            students: elementsArray
+        }
+        res.send(response);
+        console.info('get all students api called');
 
+        //})
+        // }
+        // }))
+
+    })
 })
+
+
+router.post("/countallstudents/:class/:section", function(req, res) {
+    var count = 0;
+    const { email } = req.body;
+    Student.find({ "email": email }, function(err, student) {
+        student[student.length - 1].addstudent.forEach(element => {
+            console.log(element)
+            if (element != null) {
+                if (element.class == req.params.class && element.section == req.params.section)
+                    count++;
+            }
+
+        })
+        var response = {
+            statusCode: 200,
+            headers: { 'Content-Type': 'application/json' },
+            count: count
+        }
+        console.log('count', count);
+        if (err) throw err;
+        res.send(response);
+        console.info('count all students api called');
+
+    })
 })
 
-
-router.get("/countallstudents/:class/:section",function(req,res){
-         var count = 0;
-         const { email } = req.body;
-         Student.find({"email":email},function(err,student){
-                 student[student.length-1].addstudent.forEach(element => {
-                     if(element!=null){
-                         if(element.class == req.params.class && element.section == req.params.section )
-                         count++;
-                     }
- 
-                 })
-                 var response = {
-                    statusCode: 200,
-                    headers:  { 'Content-Type': 'application/json' },
-                    count:    count
-                  }
-                 console.log('count',count);
-                  if(err) throw err;
-                  res.send(response);
-                  console.info('count all students api called');
- 
- })
- })
-
- router.get("/getstudents/:class/:section",function(req,res){
+router.get("/getstudents/:class/:section", function(req, res) {
 
     const { email } = req.body;
     let getstudents = [];
- 
 
-    Student.find({"email":email},function(err,student){
-            student[student.length-1].addstudent.forEach(element => {
-                if(element!=null){
-                    if(element.class == req.params.class && element.section == req.params.section )
+
+    Student.find({ "email": email }, function(err, student) {
+        student[student.length - 1].addstudent.forEach(element => {
+            if (element != null) {
+                if (element.class == req.params.class && element.section == req.params.section)
                     getstudents.push(element);
-                }
-             })
-            var response = {
-               statusCode: 200,
-               headers:  { 'Content-Type': 'application/json' },
-               getstudents:   getstudents
-             }
-             if(err) throw err;
-             res.send(response);
-             console.info('get students based on class api called');
+            }
+        })
+        var response = {
+            statusCode: 200,
+            headers: { 'Content-Type': 'application/json' },
+            getstudents: getstudents
+        }
+        if (err) throw err;
+        res.send(response);
+        console.info('get students based on class api called');
 
+    })
 })
-})
-router.post("/getclasses",function(req,res){
+router.post("/getclasses", function(req, res) {
 
     const { email } = req.body;
     let getstudents = [];
- 
 
-    Student.find({"email":email},function(err,student){
-        console.log('Email',email);
-            classMap = new Map;
-            student[student.length-1].addstudent.forEach(element => {
-                if(element!=null){
-                    var classandsection = element.class + " "+ element.section;
-                    classMap.set(classandsection,element.teacherName);
-                    classandsection ="";
+
+    Student.find({ "email": email }, function(err, student) {
+        console.log('Email', email);
+        console.log('Hello', student)
+        classMap = new Map;
+        student[student.length - 1].addstudent.forEach(element => {
+            if (element != null) {
+                var classandsection = element.class + " " + element.section;
+                classMap.set(classandsection, element.teacherName);
+                classandsection = "";
                 //     getstudents.push(element);
                 // if(element.class not in getstudents) {
 
                 // }
                 // console.log("ELE1",element.section);
-                 }
+            }
 
-             })
-             console.log('classMap',classMap);
+        })
+        console.log('classMap', classMap);
 
-            var response = {
-               statusCode: 200,
-               headers:  { 'Content-Type': 'application/json' },
-               classes:   [...classMap]
-             }
-             if(err) throw err;
-             res.send(response);
-             console.info('get classes api called');
+        var response = {
+            statusCode: 200,
+            headers: { 'Content-Type': 'application/json' },
+            classes: [...classMap]
+        }
+        if (err) throw err;
+        res.send(response);
+        console.info('get classes api called');
 
-})
+    })
 })
 
 module.exports = router;
