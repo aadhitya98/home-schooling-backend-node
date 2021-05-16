@@ -303,5 +303,20 @@ router.post("/getclasses", function(req, res) {
 
     })
 })
+router.delete('/deleteclassandsection',function(req,res) {
+    var response = {};
+    var responseMessage = '';
+        Student.update({"email":req.body.email},{$pull:{addstudent:{"class":req.body.class,"section":req.body.section}}},{multi: true}, function(err,object){           
+            responseMessage = 'Class '+req.body.class+' Section '+req.body.section+' is deleted from email '+req.body.email;
+            response = {
+                statusCode: 200,
+                message:   responseMessage
+            }
+    res.send(response);
+    console.log('Delete Class Api Called');
+    if(err)
+      throw err;
+    })
+})
 
 module.exports = router;
