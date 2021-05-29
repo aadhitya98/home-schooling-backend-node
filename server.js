@@ -5,6 +5,7 @@ const MongoServer = require('./configuration/db');
 const app = express();
 const userDetails = require("./routes/userdetails");
 const addclassDetails = require("./routes/addclassdetails");
+const addteacherDetails = require("./routes/addteachers")
 MongoServer();
 const PORT = process.env.PORT || 4000;
 
@@ -16,6 +17,7 @@ app.get("/", (req, res) => {
 
 app.use("/api", userDetails);
 app.use("/addclass", addclassDetails);
+app.use("/teacher",addteacherDetails);
 //userDetails.initialize(app)
 app.listen(PORT, (req, res) => {
     console.log(`Server Started at PORT ${PORT}`);
