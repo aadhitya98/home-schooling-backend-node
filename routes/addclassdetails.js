@@ -72,6 +72,10 @@ router.post('/addclassdetails', async function(req, res) {
 // })
 router.post('/addstudentdetails', async function(req, res) {
     const { email, addstudent } = req.body;
+    const reqClass = [];
+    var isDuplicate = false;
+    const dupClasses = [];
+    const dup = [];
     try {
         let addstudentuser = await User.findOne({
             email
@@ -84,14 +88,61 @@ router.post('/addstudentdetails', async function(req, res) {
             email,
             addstudent
         });
-        await Student.updateOne({
-                email: email
-            }, { $addToSet: { addstudent: addstudent } }, { upsert: true }
-
-        );
-        return res.status(200).json({
-            message: "Student is successfully added",
+        console.log('REquest',req.body.addstudent)
+        dup.push(req.body.addstudent)
+       // if(req.body.addstudent.length!=0){
+        dup.forEach((classs) => { 
+            
+            reqClass.push(classs);
+        }
+        
+    
+    );
+    console.log('dup',reqClass);
+//}
+    console.log("reqClassArray",reqClass[0][0]);
+        Student.findOne({email:email},async function(err,res1){
+            
+            res1.addstudent.forEach((addstu) => {
+                console.log("ADDSTU",addstu);
+               // if(addstu!=null || reqClass[0].class!=null){
+               if(addstu.class == reqClass[0][0].class && addstu.section == reqClass[0][0].section){
+                   console.log('Duplicate Entry');
+                   isDuplicate = true;
+                   dupClasses.push(addstu);
+                // return res.status(500).json({
+                //     message: "Duplicate Class Entry",
+                // })
+                    // return res.status(500).json({
+                    //     message: "Duplicate Student",
+                    // })
+               }
+           
+            //}
+            // else {
+            //     console.log("NULL ERROR");
+            // }
+            //console.log('isDUp',dupClasses);
+            })
+            if(!isDuplicate){
+                await Student.updateOne({
+                        email: email
+                    }, { $addToSet: { addstudent: addstudent } }, { upsert: true }
+        
+                );
+                return res.status(200).json({
+                    message: "Student is successfully added",
+                })
+            }
+            else {
+                return res.status(500).json({
+                    message: "Duplicate Student entry",
+                })
+            }
+            console.log('isDUp23',dupClasses); 
         })
+        console.log('isDUp',dupClasses);
+        
 
     } catch (err) {
         console.log("Error", err.message);
