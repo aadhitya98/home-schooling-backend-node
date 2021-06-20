@@ -106,7 +106,7 @@ router.post('/addstudentdetails', async function(req, res) {
             res1.addstudent.forEach((addstu) => {
                 console.log("ADDSTU",addstu);
                // if(addstu!=null || reqClass[0].class!=null){
-               if(addstu.class == reqClass[0][0].class && addstu.section == reqClass[0][0].section){
+               if(addstu.class == reqClass[0][0].class && addstu.section == reqClass[0][0].section && reqClass[0][0].studentName == ''){
                    console.log('Duplicate Entry');
                    isDuplicate = true;
                    dupClasses.push(addstu);
@@ -136,7 +136,7 @@ router.post('/addstudentdetails', async function(req, res) {
             }
             else {
                 return res.status(500).json({
-                    message: "Duplicate Student entry",
+                    message: "Duplicate Entry",
                 })
             }
             console.log('isDUp23',dupClasses); 
