@@ -5,13 +5,14 @@ const TeacherSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    addteacher :[{
-            uniqueID: { type: String, unique:true,dropDups: true }, 
-            class: { type: String },
-            section: { type: String },
-            teacherName: { type: String },
-            phoneNumber: { type: String },
-            _id: false
+    addteacher: [{
+        uniqueID: { type: String, unique: true, dropDups: true },
+        class: { type: String },
+        section: { type: String },
+        teacherName: { type: String },
+        phoneNumber: { type: String },
+        subjectName: { type: String },
+        _id: false
     }]
 })
-module.exports = mongoose.model("AddTeachers",TeacherSchema);
+module.exports = mongoose.model("AddTeachers", TeacherSchema);
