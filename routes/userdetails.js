@@ -32,7 +32,7 @@ router.post("/signup", [
                 error: error.array()
             });
         }
-        const { username, password, email, phonenumber } = req.body;
+        const { username, password, email, phonenumber, createdUser } = req.body;
         try {
             let user = await User.findOne({
                 email
@@ -46,7 +46,8 @@ router.post("/signup", [
                 username,
                 password,
                 email,
-                phonenumber
+                phonenumber,
+                createdUser
             });
             const salt = await bcrypt.genSalt(15);
             user.password = await bcrypt.hash(password, salt)

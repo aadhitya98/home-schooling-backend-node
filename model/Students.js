@@ -12,6 +12,7 @@ const StudentSchema = mongoose.Schema({
             rollNumber: { type: String, unique:true }, 
             teacherName: { type: String },
             phoneNumber: { type: String },
+            email: {type: String},
             _id: false
         },
 
