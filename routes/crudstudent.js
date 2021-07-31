@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Student = require("../model/Students");
+const User = require("../model/User");
+const bcrypt = require("bcryptjs");
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb+srv://home-schooling:godislove158@cluster0.ncicr.mongodb.net/HomeSchooling?w=majority&retryWrites=true"
 
@@ -38,5 +40,28 @@ router.post('/getclassfromschedule',function(req,res){
     });
     console.info('Scheduler api for students is ui called');
 })
+
+
+});
+
+router.post('/changepassword', async function(req,res){
+    const {email, newPassword} = req.body;
+    const salt = await bcrypt.genSalt(15);
+    const encryptednewpassword = await bcrypt.hash(newPassword, salt)
+    try {
+    await User.updateOne({
+        email: email
+    },  { password: encryptednewpassword }
+   
+);
+console.info('change password api in student UI is called');
+}catch (err) {
+    console.log("Error", err.message);
+    res.status(500).send("Error in Storing the details to the DB");
+}
+return res.status(200).json({
+    message: "Password has been successfully changed"
+})
+
 });
 module.exports = router;
