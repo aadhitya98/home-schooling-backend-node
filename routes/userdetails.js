@@ -7,6 +7,7 @@ const auth = require("../middleware/auth");
 var nodemailer = require('nodemailer');
 var async = require('async');
 var crypto = require('crypto');
+var cryptojs = require('crypto-js');
 // var logger = require('logger').createLogger();
 const User = require("../model/User");
 const { writer } = require("repl");
@@ -49,8 +50,7 @@ router.post("/signup", [
                 phonenumber,
                 createdUser
             });
-            const salt = await bcrypt.genSalt(15);
-            user.password = await bcrypt.hash(password, salt)
+
             await user.save();
             const payload = {
                 user: {
@@ -102,7 +102,10 @@ router.post(
                     message: "Email Not Exists"
                 });
 
-            const isCorrect = await bcrypt.compare(password, user.password);
+            const decryptWithAES = cryptojs.AES.decrypt(password, '123')
+            const originalText = decryptWithAES.toString(cryptojs.enc.Utf8);
+
+            const isCorrect = await bcrypt.compare(originalText, user.password);
             if (!isCorrect)
                 return res.status(400).json({
                     message: "Incorrect Password"
@@ -122,7 +125,8 @@ router.post(
                 (err, token) => {
                     if (err) throw err;
                     res.status(200).json({
-                        token,"User":user.role
+                        token,
+                        "User": user.role
                     });
                 }
             );
@@ -135,7 +139,7 @@ router.post(
         console.info('login Api called');
 
     }
-    
+
 );
 
 router.get("/loggedin", auth, async(req, res) => {
@@ -209,7 +213,7 @@ router.post('/forgotpassword', function(req, res, next) {
             if (err)
                 return next(err);
         }
-        
+
     )
     console.info('Forgot Password api called');
 
@@ -233,28 +237,27 @@ router.post("/resetpassword/:token", function(req, res) {
                 //         user.password = req.body.password;
                 //     });
                 // });
-                return bcrypt.hash(req.body.password, 15, (err, hash) => {
-                    if (err) {
-                        return res.status(400)
-                            .json({ message: 'Error hashing' })
-                    } else {
-                        user.password = hash;
-                        user.resetPasswordToken = undefined;
-                        user.resetPasswordExpires = undefined;
+                // return bcrypt.hash(req.body.password, 15, (err, hash) => {
+                //             if (err) {
+                //                 return res.status(400)
+                //                     .json({ message: 'Error hashing' })
+                //             } else {
+                user.password = req.body.password;
+                user.resetPasswordToken = undefined;
+                user.resetPasswordExpires = undefined;
 
-                        user.save(function(err) {
-                            if (err) {
-                                return res.status(500).send({
-                                    msg: err.message
-                                })
-                            }
-                            done(err, user);
-                            return res.status(200).json({
-                                message: "Your password is successfully changed"
-                            })
-                        });
+                user.save(function(err) {
+                    if (err) {
+                        return res.status(500).send({
+                            msg: err.message
+                        })
                     }
-                })
+                    done(err, user);
+                    return res.status(200).json({
+                        message: "Your password is successfully changed"
+                    })
+                });
+
 
             });
         },
