@@ -29,6 +29,9 @@ const UserSchema = mongoose.Schema({
     },
     createdUser : {
         type: String
+    },
+    subject: {
+        type: String
     }
 
 });

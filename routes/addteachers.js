@@ -3,6 +3,20 @@ const router = express.Router();
 const Teacher = require("../model/AddTeacher");
 const User = require("../model/User");
 
+router.post('/getallteachers', function(req,res) {
+    const { email } = req.body;
+    let getAllTeachers = [];
+    Teacher.find({ "email": email },(err,teacher) => {
+        teacher[teacher.length - 1].addteacher.forEach(element => {
+            getAllTeachers.push(element);
+        })
+        console.log("TEEAAAA",getAllTeachers)
+        res.send(getAllTeachers);
+        if(err) throw err;
+    })
+    
+
+})
 router.post("/getteachers/:class/:section", function(req, res) {
 
     const { email } = req.body;
@@ -93,5 +107,29 @@ async function dataStorage(email, addteacher) {
         email: email
     }, { $addToSet: { addteacher: addteacher } }, { upsert: true });
 }
+
+router.post("/getteacherdetails", function(req, res) {
+
+    const { email, teachername, classname, section, phonenumber } = req.body;
+    let getteachers = [];
+
+    Teacher.find({ "email": email }, function(err, teacher) {
+        teacher[teacher.length - 1].addteacher.forEach(element => {
+            if (element != null) {
+                if (element.class == classname && element.section == section && element.teacherName == teachername &&element.phoneNumber == phonenumber)
+                    getteachers.push(element);
+            }
+        })
+        var response = {
+            statusCode: 200,
+            headers: { 'Content-Type': 'application/json' },
+            getteachers: getteachers
+        }
+        if (err) throw err;
+        res.send(response);
+        console.info('get teacher details api called');
+
+    })
+})
 
 module.exports = router;

@@ -33,7 +33,7 @@ router.post("/signup", [
                 error: error.array()
             });
         }
-        const { username, password, email, phonenumber, createdUser } = req.body;
+        const { username, password, email, phonenumber, createdUser, role, subject } = req.body;
         try {
             let user = await User.findOne({
                 email
@@ -48,7 +48,9 @@ router.post("/signup", [
                 password,
                 email,
                 phonenumber,
-                createdUser
+                createdUser,
+                role,
+                subject
             });
 
             await user.save();
