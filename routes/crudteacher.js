@@ -5,8 +5,9 @@ const User = require("../model/User");
 const bcrypt = require("bcryptjs");
 var MongoClient = require('mongodb').MongoClient;
 const Assignment = require('../model/Assignment');
+var multer = require('multer');  
 var url = "mongodb+srv://home-schooling:godislove158@cluster0.ncicr.mongodb.net/HomeSchooling?w=majority&retryWrites=true"
-
+var AssignmentFile = require('../model/AssignmentFile');
 var upcomingclassdetails = [];
 
 MongoClient.connect(url, function(err, db) {
@@ -98,6 +99,43 @@ router.post('/getassignment', async function(req, res) {
         if (err) throw err;
     })
 });
+
+var assignmentstorage = multer.diskStorage({  
+    destination:function(req,file,cb){  
+        cb(null, __basedir + "/uploadAssignments/");
+    },  
+    filename(req,file,cb){  
+        cb(null,file.originalname)  
+    }  
+})  
+var assignupload = multer({storage:assignmentstorage}); 
+router.post('/uploadAssignment',assignupload.single('file'),(req,res)=>{
+    console.log('REQ',req);
+    var assign = new AssignmentFile({
+        filepath :"/uploadAssignments/"+ req.file.originalname,
+        class : req.body.class,
+        section: req.body.section,
+        studentname: req.body.studentname,
+        studentemail: req.body.studentemail,
+        filename:  req.file.originalname
+    })
+    assign.save((err,data) => {
+        if(err) console.log('Err',err);
+        console.log('Data',data);
+        res.send({message:"The data "+data+" is stored"});
+    })
+    console.log('Assignment upload API called');
+});
+router.post('/downloadAssignment',(req,res)=> {
+    AssignmentFile.find({filename: req.body.filename},(err,data)=>{
+        if(err) throw err;
+        console.log('DATA',data);
+        res.download( __dirname + data[0].filepath);
+    })
+    console.log('Assignment Download API called');
+
+});
+
 
 //)
 
