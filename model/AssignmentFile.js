@@ -6,6 +6,7 @@ const AssignmentFileSchema = new mongoose.Schema({
     section: String,
     studentname: String,
     studentemail: String,
+    teacheremail: String,
     filename: String
 });
 

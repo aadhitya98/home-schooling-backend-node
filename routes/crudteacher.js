@@ -5,6 +5,7 @@ const User = require("../model/User");
 const bcrypt = require("bcryptjs");
 var MongoClient = require('mongodb').MongoClient;
 const Assignment = require('../model/Assignment');
+const Marks = require('../model/Marks');
 var multer = require('multer');  
 var url = "mongodb+srv://home-schooling:godislove158@cluster0.ncicr.mongodb.net/HomeSchooling?w=majority&retryWrites=true"
 var AssignmentFile = require('../model/AssignmentFile');
@@ -92,6 +93,13 @@ async function dataStorage(classs, section, addassignment) {
     }, { $addToSet: { addassignment: addassignment } }, { upsert: true });
 }
 
+async function marksStorage(classs, section, addmarks) {
+    await Marks.updateOne({
+        class: classs,
+        section: section,
+    }, { $addToSet: { addmarks: addmarks } }, { upsert: true });
+}
+
 router.post('/getassignment', async function(req, res) {
     const { classs, section } = req.body;
     Assignment.find({ class: req.body.class, section: section }, (err, assignment) => {
@@ -117,6 +125,7 @@ router.post('/uploadAssignment',assignupload.single('file'),(req,res)=>{
         section: req.body.section,
         studentname: req.body.studentname,
         studentemail: req.body.studentemail,
+        teacheremail: req.body.teacheremail,
         filename:  req.file.originalname
     })
     assign.save((err,data) => {
@@ -126,13 +135,51 @@ router.post('/uploadAssignment',assignupload.single('file'),(req,res)=>{
     })
     console.log('Assignment upload API called');
 });
+
+router.post('/getassignmentbyteacher', (req,res) => {
+    const { section, teacheremail} = req.body;
+   
+    AssignmentFile.find({class: req.body.class, section: section, teacheremail: teacheremail},(err,assignment) => {
+        res.send(assignment);
+
+        if(err)
+        throw err;
+    })
+    console.log('Get assignments by teacher api called');
+
+})
 router.post('/downloadAssignment',(req,res)=> {
     AssignmentFile.find({filename: req.body.filename},(err,data)=>{
         if(err) throw err;
-        console.log('DATA',data);
+        console.log('download DATA',data);
         res.download( __dirname + data[0].filepath);
     })
     console.log('Assignment Download API called');
+
+});
+
+router.post('/entermarks',(req,res)=> {
+    const { classs, section, addmarks } = req.body;
+    AssignmentFile.find({filename: req.body.filename},(err,data)=>{
+        try {
+            let cl = req.body.class;
+           marks = new Marks({
+            class: cl,
+            section: section,
+            addmarks: addmarks
+        })
+        console.log(marks);
+        marksStorage(req.body.class, req.body.section, addmarks);
+
+        return res.status(200).json({
+            message: "Marks are successfully entered",
+        })
+       } catch (err) {
+        console.log("Error", err.message);
+        res.status(500).send("Error in Storing Marks");
+    }
+    })
+    console.log('Enter marks API called');
 
 });
 
